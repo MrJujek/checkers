@@ -4,6 +4,7 @@ import { game } from "./main"
 export default class Net {
     playerInfo: HTMLElement
     mainDiv: HTMLElement
+    url: string = "https://dev.juliandworzycki.pl/api"
 
     constructor() {
         this.playerInfo = document.getElementById("playerInfo")!
@@ -20,7 +21,7 @@ export default class Net {
 
         let interval = setInterval(() => {
             (async () => {
-                await fetch("/GET_USERS", { method: "post", body, headers })
+                await fetch(this.url + "/GET_USERS", { method: "post", body, headers })
                     .then(response => response.json())
                     .then(
                         data => {
@@ -54,7 +55,7 @@ export default class Net {
         const headers = { "Content-Type": "application/json" };
 
         (async () => {
-            fetch("/ADD_USER", { method: "post", body, headers })
+            fetch(this.url + "/ADD_USER", { method: "post", body, headers })
                 .then(response => response.json())
                 .then(
                     data => {
@@ -83,12 +84,12 @@ export default class Net {
         const headers = { "Content-Type": "application/json" };
 
         (async () => {
-            await fetch("/RESET", { method: "post", body, headers, })
+            await fetch(this.url + "/RESET", { method: "post", body, headers, })
                 .then(response => response.json())
                 .then(
-                    data => {
-                        this.playerInfo.innerHTML = data
-                            (document.getElementById("dajDane") as HTMLInputElement).value = ""
+                    (data) => {
+                        this.playerInfo.innerHTML = data;
+                        (document.getElementById("dajDane") as HTMLInputElement).value = "";
                     }
                 )
         })();

@@ -3,14 +3,12 @@ const app = express()
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(express.static('static'))
-app.use(express.static('static/cwiczenia'))
+app.use(express.static('static/dist'))
 app.use(express.urlencoded({
     extended: true
 }));
 
 let users: string[]
-
 // app.get("/", function (req, res) {
 //     res.sendFile("index.html")
 // })

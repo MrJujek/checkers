@@ -110,9 +110,10 @@ export default class Game {
             const intersects = this.raycaster.intersectObjects(this.scene.children);
             //console.log(intersects);
             if (intersects.length > 0) {
-                let whatWasClicked = (<THREE.Mesh>intersects[0].object);
+                let whatWasClicked = (<BoardSquare | Pawn>intersects[0].object);
                 //console.log(intersects[0].object.what);
-                if (whatWasClicked.what == "Pawn") {
+
+                if (whatWasClicked instanceof Pawn) {
                     if (player == 1) {
                         if (whatWasClicked.player == "white") {
                             if (pawnChecked) {
