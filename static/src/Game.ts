@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import Pawn from './Pawn'
+import BoardSquare from './BoardSquare'
 
 export default class Game {
     size: number
@@ -61,16 +63,19 @@ export default class Game {
     }
 
     createBoard = () => {
+        const jasne = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/light.jpg') });
+        const ciemne = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/dark.jfif') });
+
         let cube
 
         for (let i = 0; i < this.board.length; i++) {
             for (let j = 0; j < this.board[i].length; j++) {
                 if (this.board[i][j] == 1) {
-                    cube = new BoardSquare("light", this.size, i, j)
+                    cube = new BoardSquare("light", this.size, i, j, jasne, ciemne)
                     this.scene.add(cube);
                     cube.position.set(i * this.size + this.size / 2, 2.5, j * this.size + this.size / 2)
                 } else {
-                    cube = new BoardSquare("dark", this.size, i, j)
+                    cube = new BoardSquare("dark", this.size, i, j, jasne, ciemne)
                     this.scene.add(cube);
                     cube.position.set(i * this.size + this.size / 2, 2.5, j * this.size + this.size / 2)
                 }
@@ -169,59 +174,5 @@ export default class Game {
             this.camera.position.set(this.size * 4, 500, 500)
         }
         this.checkForMovePawn(player);
-    }
-}
-
-class BoardSquare extends THREE.Mesh {
-    geometry: THREE.BoxGeometry
-    material: THREE.MeshBasicMaterial
-    squareColor: string
-    what: string
-    boardX: number
-    boardY: number
-
-    constructor(color: string, size: number, i: number, j: number) {
-        super()
-        const jasne = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/light.jpg') });
-        const ciemne = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/dark.jfif') });
-
-        this.geometry = new THREE.BoxGeometry(size, 5, size);
-        this.squareColor = color
-        this.what = "BoardSquare"
-        this.boardX = j
-        this.boardY = i
-
-        if (color == "light") {
-            this.material = jasne
-        } else {
-            this.material = ciemne
-        }
-    }
-}
-
-class Pawn extends THREE.Mesh {
-    geometry: THREE.CylinderGeometry
-    material: THREE.MeshBasicMaterial
-    player: string
-    what: string
-    pawnX: number
-    pawnY: number
-
-    constructor(color: string, size: number, i: number, j: number) {
-        super()
-        const white = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/bialy.jpg') });
-        const black = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/czarny.jpg') });
-
-        this.geometry = new THREE.CylinderGeometry(size / 2, size / 2, 10, 20);
-        this.player = color
-        this.what = "Pawn"
-        this.pawnX = j
-        this.pawnY = i
-
-        if (color == "white") {
-            this.material = white
-        } else {
-            this.material = black
-        }
     }
 }
