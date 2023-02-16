@@ -1,6 +1,11 @@
 import express from "express";
+const http = require('http');
 const app = express()
 const PORT = process.env.PORT || 5000;
+
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const socketio = new Server(server);
 
 app.use(express.json());
 app.use(express.static('static/dist'))

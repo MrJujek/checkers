@@ -1,14 +1,17 @@
 import { ui } from "./main"
 import { game } from "./main"
+import { io, Socket } from "../node_modules/socket.io-client";
 
 export default class Net {
     playerInfo: HTMLElement
     mainDiv: HTMLElement
     url: string = "https://dev.juliandworzycki.pl/api"
+    client: Socket
 
     constructor() {
         this.playerInfo = document.getElementById("playerInfo")!
         this.mainDiv = document.getElementById("mainDiv")!
+        this.client = io();
     }
 
     waitForSecondPlayer = () => {
