@@ -129,8 +129,6 @@ export default class Game {
 
                         this.clearPossibleMoves();
                     } else {
-                        console.log(whatWasClicked.material.color.getHex());
-                        whatWasClicked.material.color.setHex(0xff0000);
                         if (player == 1) {
                             if (whatWasClicked.player == "white") {
                                 if (pawnChecked) {
@@ -231,7 +229,7 @@ export default class Game {
                     coloredSquares++;
                 }
 
-                if (coloredSquares == 2) {
+                if (coloredSquares >= 2) {
                     break;
                 }
             }
@@ -244,15 +242,20 @@ export default class Game {
             let sceneChildren = <BoardSquare>this.scene.children[i];
 
             if (this.scene.children[i] instanceof BoardSquare) {
+                // do przodu w lewo
                 if (sceneChildren.boardX == whatWasClicked.pawnX - 1 && sceneChildren.boardY == whatWasClicked.pawnY + 1) {
+                    // pole puste
                     if (this.pawns[sceneChildren.boardY][sceneChildren.boardX] == 0) {
                         sceneChildren.material.color.setHex(0x00ff00);
+                        // pole zajęte
                     }
 
                     coloredSquares++;
                 }
 
+                // do przodu w prawo
                 if (sceneChildren.boardX == whatWasClicked.pawnX + 1 && sceneChildren.boardY == whatWasClicked.pawnY + 1) {
+                    // pole puste
                     if (this.pawns[sceneChildren.boardY][sceneChildren.boardX] == 0) {
                         sceneChildren.material.color.setHex(0x00ff00);
                     }
@@ -260,7 +263,7 @@ export default class Game {
                     coloredSquares++;
                 }
 
-                if (coloredSquares == 2) {
+                if (coloredSquares >= 2) {
                     break;
                 }
             }

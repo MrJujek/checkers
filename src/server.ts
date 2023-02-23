@@ -14,9 +14,10 @@ app.use(express.urlencoded({
 }));
 
 let users: string[]
-// app.get("/", function (req, res) {
-//     res.sendFile("index.html")
-// })
+
+app.get("/", function (req, res) {
+    res.sendFile("index.html")
+})
 
 app.post("/ADD_USER", (req, res) => {
     console.log(req.body);
