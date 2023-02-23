@@ -8,14 +8,16 @@ export default class BoardSquare extends THREE.Mesh {
     boardX: number
     boardY: number
 
-    constructor(color: string, size: number, i: number, j: number, lightMaterial: THREE.MeshBasicMaterial, darkMaterial: THREE.MeshBasicMaterial) {
+    constructor(color: string, size: number, i: number, j: number) {
         super()
-        
+        const lightMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/light.jpg') });
+        const darkMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: new THREE.TextureLoader().load('mats/dark.jfif') });
+
         this.geometry = new THREE.BoxGeometry(size, 5, size);
         this.squareColor = color
         this.what = "BoardSquare"
-        this.boardX = j
-        this.boardY = i
+        this.boardX = i
+        this.boardY = j
 
         if (color == "light") {
             this.material = lightMaterial
