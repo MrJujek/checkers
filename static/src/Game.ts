@@ -219,6 +219,8 @@ export default class Game {
                     }
 
                     coloredSquares++;
+                    console.log("coloredSquares:", coloredSquares);
+
                 }
 
                 if (sceneChildren.boardX == whatWasClicked.pawnX + 1 && sceneChildren.boardY == whatWasClicked.pawnY - 1) {
