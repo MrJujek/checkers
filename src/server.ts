@@ -52,6 +52,11 @@ app.post("/GET_USERS", (req, res) => {
     res.end(JSON.stringify(users.length));
 })
 
+socketio.on('connection', (client: any) => {
+    console.log("klient się podłączył z id = ", client.id)
+    // client.id - unikalna nazwa klienta generowana przez socket.io
+});
+
 
 app.listen(PORT, function () {
     console.log("server start on port " + PORT)

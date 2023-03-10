@@ -41,4 +41,25 @@ export default class Ui {
         waitingDiv.innerHTML = "Czekam na drugiego gracza"
         document.body.appendChild(waitingDiv)
     }
+
+    waitForYourTurn = () => {
+        let waitingDiv = document.createElement("div")
+        waitingDiv.id = "waitingDiv"
+
+
+        let currentTime = 30
+        waitingDiv.innerHTML = "Teraz gra przeciwnik.<br>Czekaj " + currentTime + "s"
+
+        let timer = setInterval(() => {
+            currentTime--
+            waitingDiv.innerHTML = "Teraz gra przeciwnik.<br>Czekaj " + currentTime + "s"
+
+            if (currentTime <= 0) {
+                waitingDiv.remove()
+                clearInterval(timer)
+            }
+        }, 1000)
+
+        document.body.appendChild(waitingDiv)
+    }
 }

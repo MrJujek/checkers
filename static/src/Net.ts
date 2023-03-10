@@ -1,17 +1,23 @@
 import { ui } from "./main"
 import { game } from "./main"
-import { io, Socket } from "../node_modules/socket.io-client";
+//import { io, Socket } from "../node_modules/socket.io-client";
 
 export default class Net {
     playerInfo: HTMLElement
     mainDiv: HTMLElement
     url: string = "https://dev.juliandworzycki.pl/api"
-    client: Socket
+    //client: Socket
+    playerColor: string
 
     constructor() {
+        this.playerColor = ""
         this.playerInfo = document.getElementById("playerInfo")!
         this.mainDiv = document.getElementById("mainDiv")!
-        this.client = io();
+
+        // this.client = io()
+        // this.client.on("onconnect", (data) => {
+        //     console.log(data.clientId)
+        // })
     }
 
     waitForSecondPlayer = () => {
@@ -35,10 +41,12 @@ export default class Net {
                             if (data == "1") {
                                 this.mainDiv.remove()
                                 this.playerInfo.innerHTML = nick + " grasz bialymi"
+                                this.playerColor = "white"
                             } else if (data == "2") {
                                 this.mainDiv.remove()
                                 if (this.playerInfo.innerHTML != nick + " grasz bialymi") {
                                     this.playerInfo.innerHTML = nick + " grasz czarnymi"
+                                    this.playerColor = "black"
                                 }
                                 clearInterval(interval)
                                 document.getElementById("waitingDiv")!.remove()

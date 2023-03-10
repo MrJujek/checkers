@@ -165,13 +165,16 @@ export default class Game {
                     }
                 } else {
                     console.log("pawns:", this.pawns[whatWasClicked.boardY][whatWasClicked.boardX]);
+                    //console.log(whatWasClicked.boardX, whatWasClicked.boardY);
 
                     if (whatWasClicked.squareColor == "dark") {
                         if (pawnChecked) {
                             if (whatWasClicked.material.color.getHex() == 0x00ff00) {
+                                //move pawn
+
                                 new Tween.Tween(oldPawn.position)
                                     .to({ x: whatWasClicked.position.x, z: whatWasClicked.position.z }, 500)
-                                    .easing(Tween.Easing.Linear.None)
+                                    .easing(Tween.Easing.Circular.Out)
                                     .start()
 
                                 oldPawn.material.color.setHex(0xffffff);
@@ -186,6 +189,33 @@ export default class Game {
                                     this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
                                 }
                                 else {
+                                    this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 1;
+                                    this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
+                                }
+                                //console.log(this.pawns);
+
+                                oldPawn.pawnX = whatWasClicked.boardX;
+                                oldPawn.pawnY = whatWasClicked.boardY;
+                                oldPawn = undefined;
+
+                                this.clearPossibleMoves();
+                            } else if (whatWasClicked.material.color.getHex() == 0x0000ff) {
+                                //capture pawn
+
+                                new Tween.Tween(oldPawn.position)
+                                    .to({ x: whatWasClicked.position.x, z: whatWasClicked.position.z }, 500)
+                                    .easing(Tween.Easing.Circular.Out)
+                                    .start()
+
+                                oldPawn.material.color.setHex(0xffffff);
+                                pawnChecked = false;
+
+                                this.removePawn((whatWasClicked.boardX + oldPawn.pawnX) / 2, (whatWasClicked.boardY + oldPawn.pawnY) / 2);
+
+                                if (player == 1) {
+                                    this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 2;
+                                    this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
+                                } else {
                                     this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 1;
                                     this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
                                 }
@@ -217,13 +247,8 @@ export default class Game {
         //1 czarny
         //2 bialy
         //0 puste
-        console.log(this.pawns);
-        console.log("START 9 SQUARES");
-        console.log(this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1])
-        console.log(this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX + 1])
-        console.log(this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1])
-        console.log("END 9 SQUARES");
 
+        //lewa gora
         if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1] == 2) {
             if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX - 2] == 0) {
                 for (let i = 0; i < this.scene.children.length; i++) {
@@ -231,21 +256,22 @@ export default class Game {
 
                     if (this.scene.children[i] instanceof BoardSquare) {
                         if (sceneChildren.boardX == whatWasClicked.pawnX - 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
-                            sceneChildren.material.color.setHex(0x00ff00);
+                            sceneChildren.material.color.setHex(0x0000ff);
                             break;
                         }
                     }
                 }
             }
         }
+        // //prawa gora
         if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1] == 2) {
             if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX + 2] == 0) {
                 for (let i = 0; i < this.scene.children.length; i++) {
                     let sceneChildren = <BoardSquare>this.scene.children[i];
 
                     if (this.scene.children[i] instanceof BoardSquare) {
-                        if (sceneChildren.boardX == whatWasClicked.pawnX - 2 && sceneChildren.boardY == whatWasClicked.pawnY + 2) {
-                            sceneChildren.material.color.setHex(0x00ff00);
+                        if (sceneChildren.boardX == whatWasClicked.pawnX + 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
+                            sceneChildren.material.color.setHex(0x0000ff);
                             break;
                         }
                     }
@@ -289,9 +315,9 @@ export default class Game {
         // console.log("this.pawns:", this.pawns);
         // console.log("this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX]:", this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX]);
 
-        console.log(this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1])
-        console.log(this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX + 1])
-        console.log(this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1])
+        // console.log(this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1])
+        // console.log(this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX + 1])
+        // console.log(this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1])
 
         let coloredSquares = 0;
         for (let i = 0; i < this.scene.children.length; i++) {
@@ -343,9 +369,9 @@ export default class Game {
                 let sceneChildren = <Pawn>this.scene.children[i];
 
                 if (sceneChildren.pawnX == x && sceneChildren.pawnY == y) {
-                    console.log("removePawn2222");
-
+                    this.pawns[y][x] = 0;
                     this.scene.remove(sceneChildren);
+
                     break;
                 }
             }

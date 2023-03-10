@@ -17,6 +17,16 @@
   <div id="root"></div>
 
   <script type="module" src="/src/main.ts"></script>
+  <script>
+    console.log("index.html")
+    window.onload = function () {
+      console.log("socket.io")
+      const client = io();
+      client.on("onconnect", (data) => {
+        console.log(data.clientId)
+      })
+    }
+  </script>
 </body>
 
 </html>
