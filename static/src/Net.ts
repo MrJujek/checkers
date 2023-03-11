@@ -1,23 +1,26 @@
 import { ui } from "./main"
 import { game } from "./main"
-//import { io, Socket } from "../node_modules/socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 export default class Net {
     playerInfo: HTMLElement
     mainDiv: HTMLElement
     url: string = "https://dev.juliandworzycki.pl/api"
-    //client: Socket
+    client: Socket
     playerColor: string
 
     constructor() {
         this.playerColor = ""
-        this.playerInfo = document.getElementById("playerInfo")!
-        this.mainDiv = document.getElementById("mainDiv")!
+        this.playerInfo = document.getElementById("playerInfo") as HTMLElement
+        this.mainDiv = document.getElementById("mainDiv") as HTMLElement
 
-        // this.client = io()
-        // this.client.on("onconnect", (data) => {
-        //     console.log(data.clientId)
-        // })
+        this.client = io("/", {
+            path: "/socket.io"
+        })
+
+        this.client.on("connect", () => {
+            console.log("Connected to server")
+        })
     }
 
     waitForSecondPlayer = () => {

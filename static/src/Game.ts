@@ -49,8 +49,6 @@ export default class Game {
             [0, 1, 0, 1, 0, 1, 0, 1], //y 6
             [1, 0, 1, 0, 1, 0, 1, 0]  //y 7
         ];
-        console.log(this.pawns[1][1]);
-
 
         //this.scene.add(new THREE.AxesHelper(100))
 

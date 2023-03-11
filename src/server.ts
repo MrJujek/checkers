@@ -1,11 +1,14 @@
 import express from "express";
-const http = require('http');
-const app = express()
+import http from "http";
+import { Server } from "socket.io";
+
 const PORT = process.env.PORT || 5000;
 
+const app = express()
 const server = http.createServer(app);
-const { Server } = require("socket.io");
-const socketio = new Server(server);
+const socketio = new Server(server, {
+    path: "/socket.io"
+});
 
 app.use(express.json());
 app.use(express.static('static/dist'))
@@ -52,12 +55,10 @@ app.post("/GET_USERS", (req, res) => {
     res.end(JSON.stringify(users.length));
 })
 
-socketio.on('connection', (client: any) => {
+socketio.on('connection', (client) => {
     console.log("klient się podłączył z id = ", client.id)
-    // client.id - unikalna nazwa klienta generowana przez socket.io
 });
 
-
-app.listen(PORT, function () {
+server.listen(PORT, function () {
     console.log("server start on port " + PORT)
 })
