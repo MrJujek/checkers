@@ -113,133 +113,136 @@ export default class Game {
     }
 
     checkForMovePawn = (player: number) => {
+        console.log("checkForMovePawn");
+
         if (this.yourTurn) {
             let pawnCanEat = false;
             let pawnChecked = false;
             let whatWasClicked: BoardSquare | Pawn
             let oldPawn: any
+
             window.addEventListener("mousedown", (e) => {
-                this.mouseVector.x = (e.clientX / (document.getElementById("root") as HTMLDivElement).offsetWidth) * 2 - 1;
-                this.mouseVector.y = -((e.clientY - 100) / (document.getElementById("root") as HTMLDivElement).offsetHeight) * 2 + 1;
-                this.raycaster.setFromCamera(this.mouseVector, this.camera);
+                if (this.yourTurn) {
+                    this.mouseVector.x = (e.clientX / (document.getElementById("root") as HTMLDivElement).offsetWidth) * 2 - 1;
+                    this.mouseVector.y = -((e.clientY - 100) / (document.getElementById("root") as HTMLDivElement).offsetHeight) * 2 + 1;
+                    this.raycaster.setFromCamera(this.mouseVector, this.camera);
 
-                const intersects = this.raycaster.intersectObjects(this.scene.children);
-                //console.log(intersects);
-                if (intersects.length > 0) {
-                    whatWasClicked = (<BoardSquare | Pawn>intersects[0].object);
+                    const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-                    //console.log(intersects[0].object.what);
-                    if (whatWasClicked instanceof Pawn) {
-                        if (whatWasClicked == oldPawn) {
-                            whatWasClicked.material.color.setHex(0xffffff);
-                            pawnChecked = false;
-                            oldPawn = undefined;
+                    if (intersects.length > 0) {
+                        whatWasClicked = (<BoardSquare | Pawn>intersects[0].object);
 
-                            this.clearPossibleMoves();
-                        } else {
-                            if (player == 1) {
-                                if (whatWasClicked.player == "white") {
-                                    if (pawnChecked) {
-                                        oldPawn.material.color.setHex(0xffffff);
-                                        whatWasClicked.material.color.setHex(0xff0000);
-                                        oldPawn = intersects[0].object;
-                                    } else {
-                                        whatWasClicked.material.color.setHex(0xff0000);
-                                        pawnChecked = true;
-                                        oldPawn = intersects[0].object;
-                                    }
+                        if (whatWasClicked instanceof Pawn) {
+                            if (whatWasClicked == oldPawn) {
+                                whatWasClicked.material.color.setHex(0xffffff);
+                                pawnChecked = false;
+                                oldPawn = undefined;
 
-                                    this.colorPossibleMovesForWhite(whatWasClicked);
-                                }
+                                this.clearPossibleMoves();
                             } else {
-                                if (whatWasClicked.player == "black") {
-                                    if (pawnChecked) {
-                                        oldPawn.material.color.setHex(0xffffff);
-                                        whatWasClicked.material.color.setHex(0xff0000);
-                                        oldPawn = intersects[0].object;
-                                    } else {
-                                        whatWasClicked.material.color.setHex(0xff0000);
-                                        pawnChecked = true;
-                                        oldPawn = intersects[0].object;
-                                    }
+                                if (player == 1) {
+                                    if (whatWasClicked.player == "white") {
+                                        if (pawnChecked) {
+                                            oldPawn.material.color.setHex(0xffffff);
+                                            whatWasClicked.material.color.setHex(0xff0000);
+                                            oldPawn = intersects[0].object;
+                                        } else {
+                                            whatWasClicked.material.color.setHex(0xff0000);
+                                            pawnChecked = true;
+                                            oldPawn = intersects[0].object;
+                                        }
 
-                                    this.colorPossibleMovesForBlack(whatWasClicked);
+                                        this.colorPossibleMovesForWhite(whatWasClicked);
+                                    }
+                                } else {
+                                    if (whatWasClicked.player == "black") {
+                                        if (pawnChecked) {
+                                            oldPawn.material.color.setHex(0xffffff);
+                                            whatWasClicked.material.color.setHex(0xff0000);
+                                            oldPawn = intersects[0].object;
+                                        } else {
+                                            whatWasClicked.material.color.setHex(0xff0000);
+                                            pawnChecked = true;
+                                            oldPawn = intersects[0].object;
+                                        }
+
+                                        this.colorPossibleMovesForBlack(whatWasClicked);
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        console.log("pawns:", this.pawns[whatWasClicked.boardY][whatWasClicked.boardX]);
-                        //console.log(whatWasClicked.boardX, whatWasClicked.boardY);
+                        } else {
+                            console.log("pawns:", this.pawns[whatWasClicked.boardY][whatWasClicked.boardX]);
+                            //console.log(whatWasClicked.boardX, whatWasClicked.boardY);
 
-                        if (whatWasClicked.squareColor == "dark") {
-                            if (pawnChecked) {
-                                if (whatWasClicked.material.color.getHex() == 0x00ff00) {
-                                    //move pawn
+                            if (whatWasClicked.squareColor == "dark") {
+                                if (pawnChecked) {
+                                    if (whatWasClicked.material.color.getHex() == 0x00ff00) {
+                                        //move pawn
 
-                                    new Tween.Tween(oldPawn.position)
-                                        .to({ x: whatWasClicked.position.x, z: whatWasClicked.position.z }, 500)
-                                        .easing(Tween.Easing.Circular.Out)
-                                        .start()
+                                        new Tween.Tween(oldPawn.position)
+                                            .to({ x: whatWasClicked.position.x, z: whatWasClicked.position.z }, 500)
+                                            .easing(Tween.Easing.Circular.Out)
+                                            .start()
 
-                                    oldPawn.material.color.setHex(0xffffff);
-                                    pawnChecked = false;
+                                        oldPawn.material.color.setHex(0xffffff);
+                                        pawnChecked = false;
 
-                                    //console.log("oldPawnX:", oldPawn.pawnX, "oldPawnY:", oldPawn.pawnY);
-                                    //console.log("pawns_oldpawn", this.pawns[oldPawn.pawnY][oldPawn.pawnX]);
+                                        //console.log("oldPawnX:", oldPawn.pawnX, "oldPawnY:", oldPawn.pawnY);
+                                        //console.log("pawns_oldpawn", this.pawns[oldPawn.pawnY][oldPawn.pawnX]);
 
+                                        if (player == 1) {
+                                            this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 2;
+                                            this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
+                                        }
+                                        else {
+                                            this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 1;
+                                            this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
+                                        }
 
-                                    if (player == 1) {
-                                        this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 2;
-                                        this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
+                                        net.movePawn(oldPawn.pawnX, oldPawn.pawnY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns);
+                                        //console.log(this.pawns);
+
+                                        oldPawn.pawnX = whatWasClicked.boardX;
+                                        oldPawn.pawnY = whatWasClicked.boardY;
+                                        oldPawn = undefined;
+
+                                        this.clearPossibleMoves();
+
+                                        net.nextTurn();
+                                    } else if (whatWasClicked.material.color.getHex() == 0x0000ff) {
+                                        //capture pawn
+
+                                        new Tween.Tween(oldPawn.position)
+                                            .to({ x: whatWasClicked.position.x, z: whatWasClicked.position.z }, 500)
+                                            .easing(Tween.Easing.Circular.Out)
+                                            .start()
+
+                                        oldPawn.material.color.setHex(0xffffff);
+                                        pawnChecked = false;
+
+                                        this.removePawn((whatWasClicked.boardX + oldPawn.pawnX) / 2, (whatWasClicked.boardY + oldPawn.pawnY) / 2);
+
+                                        if (player == 1) {
+                                            this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 2;
+                                            this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
+                                        } else {
+                                            this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 1;
+                                            this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
+                                        }
+
+                                        net.capturePawn(oldPawn.pawnX, oldPawn.pawnY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns, (whatWasClicked.boardX + oldPawn.pawnX) / 2, (whatWasClicked.boardY + oldPawn.pawnY) / 2)
+                                        //console.log(this.pawns);
+
+                                        oldPawn.pawnX = whatWasClicked.boardX;
+                                        oldPawn.pawnY = whatWasClicked.boardY;
+
+                                        pawnCanEat = this.checkIfBlackPawnCanEat(oldPawn);
+                                        console.log("pawnCanEat:", pawnCanEat);
+
+                                        oldPawn = undefined;
+
+                                        net.nextTurn();
                                     }
-                                    else {
-                                        this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 1;
-                                        this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
-                                    }
-
-                                    net.movePawn(oldPawn.pawnX, oldPawn.pawnY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns);
-                                    //console.log(this.pawns);
-
-                                    oldPawn.pawnX = whatWasClicked.boardX;
-                                    oldPawn.pawnY = whatWasClicked.boardY;
-                                    oldPawn = undefined;
-
-                                    this.clearPossibleMoves();
-
-                                    net.nextTurn();
-                                } else if (whatWasClicked.material.color.getHex() == 0x0000ff) {
-                                    //capture pawn
-
-                                    new Tween.Tween(oldPawn.position)
-                                        .to({ x: whatWasClicked.position.x, z: whatWasClicked.position.z }, 500)
-                                        .easing(Tween.Easing.Circular.Out)
-                                        .start()
-
-                                    oldPawn.material.color.setHex(0xffffff);
-                                    pawnChecked = false;
-
-                                    this.removePawn((whatWasClicked.boardX + oldPawn.pawnX) / 2, (whatWasClicked.boardY + oldPawn.pawnY) / 2);
-
-                                    if (player == 1) {
-                                        this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 2;
-                                        this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
-                                    } else {
-                                        this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 1;
-                                        this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
-                                    }
-
-                                    net.capturePawn(oldPawn.pawnX, oldPawn.pawnY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns, (whatWasClicked.boardX + oldPawn.pawnX) / 2, (whatWasClicked.boardY + oldPawn.pawnY) / 2)
-                                    //console.log(this.pawns);
-
-                                    oldPawn.pawnX = whatWasClicked.boardX;
-                                    oldPawn.pawnY = whatWasClicked.boardY;
-
-                                    pawnCanEat = this.checkIfBlackPawnCanEat(oldPawn);
-                                    console.log("pawnCanEat:", pawnCanEat);
-
-                                    oldPawn = undefined;
-
-                                    net.nextTurn();
                                 }
                             }
                         }
@@ -600,5 +603,11 @@ export default class Game {
         pawnToMove!.pawnY = whereToMove!.boardY;
 
         this.removePawn(removeX, removeY);
+    }
+
+    changeTurn = (bool: boolean) => {
+        console.log("changeTurn");
+
+        this.yourTurn = bool;
     }
 }

@@ -35,15 +35,17 @@ export default class Net {
         });
 
         this.client.on('turn', (data) => {
-            console.log("got from server", data);
+            console.log("got from server1111", data);
 
             if (data.turn == this.playerColor) {
-                game.yourTurn = true
+                game.changeTurn(true)
                 ui.stopWaiting();
             } else {
-                game.yourTurn = false
+                game.changeTurn(false)
                 ui.waitForYourTurn()
             }
+
+            game.checkForMovePawn(data.turn == "white" ? 1 : 2)
         });
 
         this.client.on('lostGame', (data) => {
