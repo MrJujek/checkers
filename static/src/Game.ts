@@ -44,10 +44,10 @@ export default class Game {
             [2, 0, 2, 0, 2, 0, 2, 0], //y 1
             [0, 0, 0, 0, 0, 0, 0, 0], //y 2
             [0, 0, 0, 0, 0, 0, 0, 0], //y 3
-            [0, 0, 0, 0, 0, 0, 0, 0], //y 4
-            [0, 0, 2, 0, 0, 0, 0, 0], //y 5
-            [0, 1, 0, 1, 0, 1, 0, 1], //y 6
-            [1, 0, 1, 0, 1, 0, 1, 0]  //y 7
+            [0, 0, 0, 2, 0, 2, 0, 0], //y 4
+            [0, 0, 0, 0, 1, 0, 0, 0], //y 5
+            [0, 1, 0, 2, 0, 2, 0, 1], //y 6
+            [1, 0, 0, 0, 1, 0, 0, 0]  //y 7
         ];
 
         //this.scene.add(new THREE.AxesHelper(100))
@@ -108,7 +108,9 @@ export default class Game {
     }
 
     checkForMovePawn = (player: number) => {
+        let pawnCanEat = false;
         let pawnChecked = false;
+        let whatWasClicked: BoardSquare | Pawn
         let oldPawn: any
         window.addEventListener("mousedown", (e) => {
             this.mouseVector.x = (e.clientX / (document.getElementById("root") as HTMLDivElement).offsetWidth) * 2 - 1;
@@ -118,7 +120,7 @@ export default class Game {
             const intersects = this.raycaster.intersectObjects(this.scene.children);
             //console.log(intersects);
             if (intersects.length > 0) {
-                let whatWasClicked = (<BoardSquare | Pawn>intersects[0].object);
+                whatWasClicked = (<BoardSquare | Pawn>intersects[0].object);
 
                 //console.log(intersects[0].object.what);
                 if (whatWasClicked instanceof Pawn) {
@@ -141,7 +143,6 @@ export default class Game {
                                     oldPawn = intersects[0].object;
                                 }
 
-                                this.clearPossibleMoves();
                                 this.colorPossibleMovesForWhite(whatWasClicked);
                             }
                         } else {
@@ -156,7 +157,6 @@ export default class Game {
                                     oldPawn = intersects[0].object;
                                 }
 
-                                this.clearPossibleMoves();
                                 this.colorPossibleMovesForBlack(whatWasClicked);
                             }
                         }
@@ -221,9 +221,11 @@ export default class Game {
 
                                 oldPawn.pawnX = whatWasClicked.boardX;
                                 oldPawn.pawnY = whatWasClicked.boardY;
-                                oldPawn = undefined;
 
-                                this.clearPossibleMoves();
+                                pawnCanEat = this.checkIfBlackPawnCanEat(oldPawn);
+                                console.log("pawnCanEat:", pawnCanEat);
+
+                                oldPawn = undefined;
                             }
                         }
                     }
@@ -242,43 +244,89 @@ export default class Game {
     }
 
     colorPossibleMovesForBlack = (whatWasClicked: Pawn) => {
+        this.clearPossibleMoves();
+        let coloredSquares = 0;
         //1 czarny
         //2 bialy
         //0 puste
 
         //lewa gora
-        if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1] == 2) {
-            if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX - 2] == 0) {
-                for (let i = 0; i < this.scene.children.length; i++) {
-                    let sceneChildren = <BoardSquare>this.scene.children[i];
+        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX - 1 >= 0) {
+            if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX - 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
 
-                    if (this.scene.children[i] instanceof BoardSquare) {
-                        if (sceneChildren.boardX == whatWasClicked.pawnX - 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
-                            sceneChildren.material.color.setHex(0x0000ff);
-                            break;
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX - 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
-        // //prawa gora
-        if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1] == 2) {
-            if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX + 2] == 0) {
-                for (let i = 0; i < this.scene.children.length; i++) {
-                    let sceneChildren = <BoardSquare>this.scene.children[i];
+        //prawa gora
+        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX + 1 <= 7) {
+            if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX + 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
 
-                    if (this.scene.children[i] instanceof BoardSquare) {
-                        if (sceneChildren.boardX == whatWasClicked.pawnX + 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
-                            sceneChildren.material.color.setHex(0x0000ff);
-                            break;
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX + 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //lewa dol
+        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX - 1 >= 0) {
+            if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX - 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
+
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX - 2 && sceneChildren.boardY == whatWasClicked.pawnY + 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //prawa dol
+        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX + 1 <= 7) {
+            if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX + 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
+
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX + 2 && sceneChildren.boardY == whatWasClicked.pawnY + 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
 
-
-        let coloredSquares = 0;
         for (let i = 0; i < this.scene.children.length; i++) {
             let sceneChildren = <BoardSquare>this.scene.children[i];
 
@@ -287,22 +335,20 @@ export default class Game {
                     if (this.pawns[sceneChildren.boardY][sceneChildren.boardX] == 0) {
                         sceneChildren.material.color.setHex(0x00ff00);
                     }
-
-                    coloredSquares++;
                 }
 
                 if (sceneChildren.boardX == whatWasClicked.pawnX + 1 && sceneChildren.boardY == whatWasClicked.pawnY - 1) {
                     if (this.pawns[sceneChildren.boardY][sceneChildren.boardX] == 0) {
                         sceneChildren.material.color.setHex(0x00ff00);
                     }
-
-                    coloredSquares++;
-                }
-
-                if (coloredSquares >= 2) {
-                    break;
                 }
             }
+        }
+
+        if (coloredSquares > 0) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -316,7 +362,7 @@ export default class Game {
         // console.log(this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1])
         // console.log(this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY][whatWasClicked.pawnX + 1])
         // console.log(this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX], this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1])
-
+        this.clearPossibleMoves();
         let coloredSquares = 0;
         for (let i = 0; i < this.scene.children.length; i++) {
             let sceneChildren = <BoardSquare>this.scene.children[i];
@@ -342,11 +388,98 @@ export default class Game {
 
                     coloredSquares++;
                 }
+            }
+        }
+    }
 
-                if (coloredSquares >= 2) {
-                    break;
+    checkIfBlackPawnCanEat = (whatWasClicked: Pawn) => {
+        this.clearPossibleMoves();
+        let coloredSquares = 0;
+        //1 czarny
+        //2 bialy
+        //0 puste
+
+        //lewa gora
+        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX - 1 >= 0) {
+            if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX - 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
+
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX - 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
+                        }
+                    }
                 }
             }
+        }
+        //prawa gora
+        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX + 1 <= 7) {
+            if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX + 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
+
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX + 2 && sceneChildren.boardY == whatWasClicked.pawnY - 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //lewa dol
+        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX - 1 >= 0) {
+            if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX - 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
+
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX - 2 && sceneChildren.boardY == whatWasClicked.pawnY + 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //prawa dol
+        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX + 1 <= 7) {
+            if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1] == 2) {
+                if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX + 2] == 0) {
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        let sceneChildren = <BoardSquare>this.scene.children[i];
+
+                        if (this.scene.children[i] instanceof BoardSquare) {
+                            if (sceneChildren.boardX == whatWasClicked.pawnX + 2 && sceneChildren.boardY == whatWasClicked.pawnY + 2) {
+                                sceneChildren.material.color.setHex(0x0000ff);
+                                coloredSquares++;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (coloredSquares > 0) {
+            return true;
+        } else {
+            return false;
         }
     }
 
