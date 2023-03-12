@@ -55,12 +55,20 @@ app.post("/GET_USERS", (req, res) => {
     res.end(JSON.stringify(users.length));
 })
 
+let turn = "white"
 socketio.on('connection', (client) => {
     console.log("klient się podłączył z id = ", client.id)
 
-    client.on('movePawn', (data) => {
-        console.log("movePawn");
+    client.on("startGame", (data) => {
+        console.log("startgame: ", data);
 
+        client.emit("turn", {
+            turn: turn
+        })
+    })
+
+
+    client.on('movePawn', (data) => {
         client.broadcast.emit("movePawnToClient", {
             fromX: data.fromX,
             fromY: data.fromY,
@@ -71,8 +79,6 @@ socketio.on('connection', (client) => {
     });
 
     client.on('capturePawn', (data) => {
-        console.log("movePawn");
-
         client.broadcast.emit("capturePawnToClient", {
             fromX: data.fromX,
             fromY: data.fromY,
@@ -81,6 +87,27 @@ socketio.on('connection', (client) => {
             pawns: data.pawns,
             removeX: data.removeX,
             removeY: data.removeY
+        })
+    });
+
+    client.on('nextTurn', (data) => {
+        if (turn == "white") {
+            turn = "black"
+        } else {
+            turn = "white"
+        }
+
+        socketio.emit("turn", {
+            turn: turn
+        })
+    });
+
+    client.on('lost', (data) => {
+        console.log("lost: ", data);
+
+        socketio.emit("lostGame", {
+            reason: data.reason,
+            loser: data.loser
         })
     });
 });

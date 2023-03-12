@@ -5,8 +5,10 @@ export default class Ui {
     dajDane: HTMLInputElement
     logujButton: HTMLDivElement
     resetButton: HTMLDivElement
+    timer: any
 
     constructor() {
+        this.timer
         this.mainDiv = document.createElement("div")
         this.dajDane = document.createElement("input")
         this.logujButton = document.createElement("div")
@@ -47,19 +49,47 @@ export default class Ui {
         waitingDiv.id = "waitingDiv"
 
 
-        let currentTime = 30
+        let currentTime = 10
         waitingDiv.innerHTML = "Teraz gra przeciwnik.<br>Czekaj " + currentTime + "s"
 
-        let timer = setInterval(() => {
+        this.timer = setInterval(() => {
             currentTime--
             waitingDiv.innerHTML = "Teraz gra przeciwnik.<br>Czekaj " + currentTime + "s"
 
             if (currentTime <= 0) {
                 waitingDiv.remove()
-                clearInterval(timer)
+                clearInterval(this.timer)
+
+                net.lost("time")
             }
         }, 1000)
 
         document.body.appendChild(waitingDiv)
+    }
+
+    stopWaiting = () => {
+        console.log("stopWaiting");
+
+        clearInterval(this.timer)
+        let waitingDiv = document.getElementById("waitingDiv")
+        if (waitingDiv != null) {
+            waitingDiv.remove()
+        }
+    }
+
+    youLost = (reason: string) => {
+        let lostDiv = document.createElement("div")
+        lostDiv.id = "lostDiv"
+        lostDiv.innerHTML = "Przegrales!<br>" + reason
+
+        document.body.appendChild(lostDiv)
+    }
+
+    youWon = (reason: string) => {
+        let wonDiv = document.createElement("div")
+        wonDiv.id = "wonDiv"
+        wonDiv.innerHTML = "Wygrales!<br>" + reason
+
+        document.body.appendChild(wonDiv)
     }
 }

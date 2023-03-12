@@ -16,27 +16,45 @@ export default class Net {
 
         this.client = io("/", {
             path: "/socket.io"
-        })
+        });
 
         this.client.on("connect", () => {
             console.log("Connected to server")
-        })
+        });
 
         this.client.on('movePawnToClient', (data) => {
-            console.log("got from server");
-
-            console.log(data);
+            console.log("got from server", data);
 
             game.moveEnemyPawn(data.fromX, data.fromY, data.toX, data.toY, data.pawns)
-        })
+        });
 
         this.client.on('capturePawnToClient', (data) => {
-            console.log("got from server");
-
-            console.log(data);
+            console.log("got from server", data);
 
             game.captureEnemyPawn(data.fromX, data.fromY, data.toX, data.toY, data.pawns, data.removeX, data.removeY)
-        })
+        });
+
+        this.client.on('turn', (data) => {
+            console.log("got from server", data);
+
+            if (data.turn == this.playerColor) {
+                game.yourTurn = true
+                ui.stopWaiting();
+            } else {
+                game.yourTurn = false
+                ui.waitForYourTurn()
+            }
+        });
+
+        this.client.on('lostGame', (data) => {
+            console.log("got from server", data);
+
+            if (data.loser == this.playerColor) {
+                ui.youWon(data.reason)
+            } else {
+                ui.youLost(data.reason)
+            }
+        });
     }
 
     waitForSecondPlayer = () => {
@@ -69,6 +87,10 @@ export default class Net {
                                 }
                                 clearInterval(interval)
                                 document.getElementById("waitingDiv")!.remove()
+
+                                this.client.emit("startGame", {
+                                    start: true
+                                })
                             }
                         })
             })();
@@ -144,6 +166,22 @@ export default class Net {
             pawns: pawns,
             removeX: removeX,
             removeY: removeY
+        })
+    }
+
+    nextTurn = () => {
+        console.log("next turn", this.playerColor);
+
+        this.client.emit("nextTurn", {
+            turn: this.playerColor
+        })
+    }
+
+    lost = (reason: string) => {
+        console.log(reason)
+        this.client.emit("lost", {
+            reason: reason,
+            loser: this.playerColor
         })
     }
 }
