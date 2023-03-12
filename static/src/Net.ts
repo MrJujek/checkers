@@ -21,6 +21,22 @@ export default class Net {
         this.client.on("connect", () => {
             console.log("Connected to server")
         })
+
+        this.client.on('movePawnToClient', (data) => {
+            console.log("got from server");
+
+            console.log(data);
+
+            game.moveEnemyPawn(data.fromX, data.fromY, data.toX, data.toY, data.pawns)
+        })
+
+        this.client.on('capturePawnToClient', (data) => {
+            console.log("got from server");
+
+            console.log(data);
+
+            game.captureEnemyPawn(data.fromX, data.fromY, data.toX, data.toY, data.pawns, data.removeX, data.removeY)
+        })
     }
 
     waitForSecondPlayer = () => {
@@ -107,5 +123,27 @@ export default class Net {
                     }
                 )
         })();
+    }
+
+    movePawn = (fromX: number, fromY: number, toX: number, toY: number, pawns: number[][]) => {
+        this.client.emit("movePawn", {
+            fromX: fromX,
+            fromY: fromY,
+            toX: toX,
+            toY: toY,
+            pawns: pawns
+        })
+    }
+
+    capturePawn = (fromX: number, fromY: number, toX: number, toY: number, pawns: number[][], removeX: number, removeY: number) => {
+        this.client.emit("capturePawn", {
+            fromX: fromX,
+            fromY: fromY,
+            toX: toX,
+            toY: toY,
+            pawns: pawns,
+            removeX: removeX,
+            removeY: removeY
+        })
     }
 }

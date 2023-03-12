@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import Pawn from './Pawn'
 import BoardSquare from './BoardSquare'
 import Tween from '@tweenjs/tween.js'
+import { net } from './main'
 
 export default class Game {
     size: number
@@ -190,6 +191,8 @@ export default class Game {
                                     this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 1;
                                     this.pawns[oldPawn.pawnY][oldPawn.pawnX] = 0;
                                 }
+
+                                net.movePawn(oldPawn.pawnX, oldPawn.pawnY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns);
                                 //console.log(this.pawns);
 
                                 oldPawn.pawnX = whatWasClicked.boardX;
@@ -209,6 +212,9 @@ export default class Game {
                                 pawnChecked = false;
 
                                 this.removePawn((whatWasClicked.boardX + oldPawn.pawnX) / 2, (whatWasClicked.boardY + oldPawn.pawnY) / 2);
+
+                                //pawnX, pawnY, boardX, boardY, pawns, removeX, removeY
+                                net.capturePawn(oldPawn.pawnX, oldPawn.pawnY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns, (whatWasClicked.boardX + oldPawn.pawnX) / 2, (whatWasClicked.boardY + oldPawn.pawnY) / 2)
 
                                 if (player == 1) {
                                     this.pawns[whatWasClicked.boardY][whatWasClicked.boardX] = 2;
@@ -243,6 +249,7 @@ export default class Game {
         this.checkForMovePawn(player);
     }
 
+    //dziala
     colorPossibleMovesForBlack = (whatWasClicked: Pawn) => {
         this.clearPossibleMoves();
         let coloredSquares = 0;
@@ -251,7 +258,7 @@ export default class Game {
         //0 puste
 
         //lewa gora
-        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX - 1 >= 0) {
+        if (whatWasClicked.pawnY - 2 >= 0 && whatWasClicked.pawnX - 2 >= 0) {
             if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX - 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -270,7 +277,7 @@ export default class Game {
             }
         }
         //prawa gora
-        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX + 1 <= 7) {
+        if (whatWasClicked.pawnY - 2 >= 0 && whatWasClicked.pawnX + 2 <= 7) {
             if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX + 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -289,7 +296,7 @@ export default class Game {
             }
         }
         //lewa dol
-        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX - 1 >= 0) {
+        if (whatWasClicked.pawnY + 2 <= 7 && whatWasClicked.pawnX - 2 >= 0) {
             if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX - 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -308,7 +315,7 @@ export default class Game {
             }
         }
         //prawa dol
-        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX + 1 <= 7) {
+        if (whatWasClicked.pawnY + 2 <= 7 && whatWasClicked.pawnX + 2 <= 7) {
             if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX + 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -392,6 +399,7 @@ export default class Game {
         }
     }
 
+    //dziala
     checkIfBlackPawnCanEat = (whatWasClicked: Pawn) => {
         this.clearPossibleMoves();
         let coloredSquares = 0;
@@ -400,7 +408,7 @@ export default class Game {
         //0 puste
 
         //lewa gora
-        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX - 1 >= 0) {
+        if (whatWasClicked.pawnY - 2 >= 0 && whatWasClicked.pawnX - 2 >= 0) {
             if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX - 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX - 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -419,7 +427,7 @@ export default class Game {
             }
         }
         //prawa gora
-        if (whatWasClicked.pawnY - 1 >= 0 && whatWasClicked.pawnX + 1 <= 7) {
+        if (whatWasClicked.pawnY - 2 >= 0 && whatWasClicked.pawnX + 2 <= 7) {
             if (this.pawns[whatWasClicked.pawnY - 1][whatWasClicked.pawnX + 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY - 2][whatWasClicked.pawnX + 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -438,7 +446,7 @@ export default class Game {
             }
         }
         //lewa dol
-        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX - 1 >= 0) {
+        if (whatWasClicked.pawnY + 2 <= 7 && whatWasClicked.pawnX - 2 >= 0) {
             if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX - 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX - 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -457,7 +465,7 @@ export default class Game {
             }
         }
         //prawa dol
-        if (whatWasClicked.pawnY + 1 <= 7 && whatWasClicked.pawnX + 1 <= 7) {
+        if (whatWasClicked.pawnY + 2 <= 7 && whatWasClicked.pawnX + 2 <= 7) {
             if (this.pawns[whatWasClicked.pawnY + 1][whatWasClicked.pawnX + 1] == 2) {
                 if (this.pawns[whatWasClicked.pawnY + 2][whatWasClicked.pawnX + 2] == 0) {
                     for (let i = 0; i < this.scene.children.length; i++) {
@@ -507,5 +515,79 @@ export default class Game {
                 }
             }
         }
+    }
+
+    moveEnemyPawn = (pawnX: number, pawnY: number, boardX: number, boardY: number, pawns: number[][]) => {
+        this.pawns = pawns;
+        let pawnToMove: Pawn;
+        let whereToMove: BoardSquare;
+
+        for (let i = 0; i < this.scene.children.length; i++) {
+            if (this.scene.children[i] instanceof Pawn) {
+                let sceneChildren = <Pawn>this.scene.children[i];
+                if (sceneChildren.pawnX == pawnX && sceneChildren.pawnY == pawnY) {
+                    pawnToMove = sceneChildren;
+
+                    break;
+                }
+            }
+        }
+        for (let i = 0; i < this.scene.children.length; i++) {
+            if (this.scene.children[i] instanceof BoardSquare) {
+                let sceneChildren = <BoardSquare>this.scene.children[i];
+                if (sceneChildren.boardX == boardX && sceneChildren.boardY == boardY) {
+                    whereToMove = sceneChildren;
+
+                    break;
+                }
+            }
+        }
+        console.log("moveEnemyPawn");
+
+        new Tween.Tween(pawnToMove!.position)
+            .to({ x: whereToMove!.position.x, z: whereToMove!.position.z }, 500)
+            .easing(Tween.Easing.Circular.Out)
+            .start()
+
+        pawnToMove!.pawnX = whereToMove!.boardX;
+        pawnToMove!.pawnY = whereToMove!.boardY;
+    }
+
+    captureEnemyPawn = (pawnX: number, pawnY: number, boardX: number, boardY: number, pawns: number[][], removeX: number, removeY: number) => {
+        this.pawns = pawns;
+        let pawnToMove: Pawn;
+        let whereToMove: BoardSquare;
+
+        for (let i = 0; i < this.scene.children.length; i++) {
+            if (this.scene.children[i] instanceof Pawn) {
+                let sceneChildren = <Pawn>this.scene.children[i];
+                if (sceneChildren.pawnX == pawnX && sceneChildren.pawnY == pawnY) {
+                    pawnToMove = sceneChildren;
+
+                    break;
+                }
+            }
+        }
+        for (let i = 0; i < this.scene.children.length; i++) {
+            if (this.scene.children[i] instanceof BoardSquare) {
+                let sceneChildren = <BoardSquare>this.scene.children[i];
+                if (sceneChildren.boardX == boardX && sceneChildren.boardY == boardY) {
+                    whereToMove = sceneChildren;
+
+                    break;
+                }
+            }
+        }
+        console.log("moveEnemyPawn");
+
+        new Tween.Tween(pawnToMove!.position)
+            .to({ x: whereToMove!.position.x, z: whereToMove!.position.z }, 500)
+            .easing(Tween.Easing.Circular.Out)
+            .start()
+
+        pawnToMove!.pawnX = whereToMove!.boardX;
+        pawnToMove!.pawnY = whereToMove!.boardY;
+
+        this.removePawn(removeX, removeY);
     }
 }

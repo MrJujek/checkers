@@ -23,7 +23,7 @@ app.get("/", function (req, res) {
 })
 
 app.post("/ADD_USER", (req, res) => {
-    console.log(req.body);
+    //console.log(req.body);
     res.setHeader('content-type', 'application/json');
     console.log(users);
 
@@ -31,7 +31,7 @@ app.post("/ADD_USER", (req, res) => {
         if (users.includes(req.body.nick)) {
             res.end(JSON.stringify("userExists"));
         } else {
-            console.log("Nie ma");
+            //console.log("Nie ma");
             users.push(req.body.nick)
 
             if (users.length == 1) {
@@ -57,7 +57,35 @@ app.post("/GET_USERS", (req, res) => {
 
 socketio.on('connection', (client) => {
     console.log("klient się podłączył z id = ", client.id)
+
+    client.on('movePawn', (data) => {
+        console.log("movePawn");
+
+        client.broadcast.emit("movePawnToClient", {
+            fromX: data.fromX,
+            fromY: data.fromY,
+            toX: data.toX,
+            toY: data.toY,
+            pawns: data.pawns
+        })
+    });
+
+    client.on('capturePawn', (data) => {
+        console.log("movePawn");
+
+        client.broadcast.emit("capturePawnToClient", {
+            fromX: data.fromX,
+            fromY: data.fromY,
+            toX: data.toX,
+            toY: data.toY,
+            pawns: data.pawns,
+            removeX: data.removeX,
+            removeY: data.removeY
+        })
+    });
 });
+
+
 
 server.listen(PORT, function () {
     console.log("server start on port " + PORT)
