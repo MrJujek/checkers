@@ -49,7 +49,7 @@ export default class Ui {
         waitingDiv.id = "waitingDiv"
 
 
-        let currentTime = 10
+        let currentTime = 20
         waitingDiv.innerHTML = "Teraz gra przeciwnik.<br>Czekaj " + currentTime + "s"
 
         this.timer = setInterval(() => {

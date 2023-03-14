@@ -104,6 +104,8 @@ body {
 #wonDiv,
 #lostDiv,
 #waitingDiv {
+  -webkit-transition: 0.1s;
+  transition: 0.1s;
   height: 100vh;
   width: 100vw;
   position: absolute;
