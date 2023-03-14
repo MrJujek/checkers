@@ -180,6 +180,9 @@ export default class Net {
     }
 
     lost = (reason: string) => {
+        game.endGame = true
+        game.clearPossibleMoves()
+
         console.log(reason)
         this.client.emit("lost", {
             reason: reason,

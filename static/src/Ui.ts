@@ -1,4 +1,5 @@
 import { net } from "./main"
+import { game } from "./main"
 
 export default class Ui {
     mainDiv: HTMLDivElement
@@ -78,6 +79,11 @@ export default class Ui {
     }
 
     youLost = (reason: string) => {
+        game.endGame = true
+        game.clearPossibleMoves()
+
+        this.stopWaiting()
+
         let lostDiv = document.createElement("div")
         lostDiv.id = "lostDiv"
         lostDiv.innerHTML = "Przegrales!<br>" + reason
@@ -86,6 +92,11 @@ export default class Ui {
     }
 
     youWon = (reason: string) => {
+        game.endGame = true
+        game.clearPossibleMoves()
+
+        this.stopWaiting()
+
         let wonDiv = document.createElement("div")
         wonDiv.id = "wonDiv"
         wonDiv.innerHTML = "Wygrales!<br>" + reason
