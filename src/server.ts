@@ -62,8 +62,8 @@ socketio.on('connection', (client) => {
     client.on("startGame", (data) => {
         console.log("startgame: ", data);
 
-        client.emit("turn", {
-            turn: turn
+        socketio.emit("turn", {
+            turn: "white"
         })
     })
 
@@ -97,6 +97,7 @@ socketio.on('connection', (client) => {
             turn = "white"
         }
 
+        console.log("nextTurn: ", data);
         socketio.emit("turn", {
             turn: turn
         })

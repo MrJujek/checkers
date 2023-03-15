@@ -49,14 +49,14 @@ export default class Game {
         // 2 - white pawn
         //x  0  1  2  3  4  5  6  7
         this.pawns = [
-            [0, 0, 0, 0, 0, 0, 0, 0], //y 0
-            [0, 0, 2, 0, 0, 0, 0, 0], //y 1
-            [0, 0, 0, 1, 0, 0, 0, 0], //y 2
+            [0, 2, 0, 2, 0, 2, 0, 2], //y 0
+            [2, 0, 2, 0, 2, 0, 2, 0], //y 1
+            [0, 0, 0, 0, 0, 0, 0, 0], //y 2
             [0, 0, 0, 0, 0, 0, 0, 0], //y 3
             [0, 0, 0, 0, 0, 0, 0, 0], //y 4
             [0, 0, 0, 0, 0, 0, 0, 0], //y 5
-            [0, 0, 0, 0, 0, 0, 0, 0], //y 6
-            [0, 0, 0, 0, 0, 0, 0, 0]  //y 7
+            [0, 1, 0, 1, 0, 1, 0, 1], //y 6
+            [1, 0, 1, 0, 1, 0, 1, 0]  //y 7
         ];
 
         //this.scene.add(new THREE.AxesHelper(100))
@@ -126,12 +126,8 @@ export default class Game {
             let oldPawn: any
 
             window.addEventListener("mousedown", (e) => {
-                console.log(this.endGame);
-
                 if (this.yourTurn && !this.capturingMode) {
                     if (this.endGame == false) {
-                        console.log("click");
-
                         this.mouseVector.x = (e.clientX / (document.getElementById("root") as HTMLDivElement).offsetWidth) * 2 - 1;
                         this.mouseVector.y = -((e.clientY - 100) / (document.getElementById("root") as HTMLDivElement).offsetHeight) * 2 + 1;
                         this.raycaster.setFromCamera(this.mouseVector, this.camera);
@@ -252,7 +248,10 @@ export default class Game {
                                                 this.clearPossibleMoves();
                                                 this.nextCaptures(oldPawn);
                                             } else {
+                                                this.checkLoser();
 
+                                                this.capturingMode = false;
+                                                net.nextTurn();
                                             }
 
                                             oldPawn = undefined;
@@ -282,7 +281,6 @@ export default class Game {
         if (pawnCanEat) {
             this.capturingMode = true;
             pawn.material.color.setHex(0xff0000);
-            let pawnChecked
 
             window.addEventListener("mousedown", (e) => {
                 if (this.yourTurn) {
@@ -296,8 +294,6 @@ export default class Game {
                         let whatWasClicked = (<BoardSquare | Pawn>intersects[0].object);
 
                         if (whatWasClicked instanceof BoardSquare) {
-                            //console.log("pawns:", this.pawns[whatWasClicked.boardY][whatWasClicked.boardX]);
-
                             if (whatWasClicked.squareColor == "dark") {
                                 if (whatWasClicked.material.color.getHex() == 0x0000ff) {
                                     //capture pawn
@@ -308,7 +304,6 @@ export default class Game {
                                         .start()
 
                                     pawn.material.color.setHex(0xffffff);
-                                    pawnChecked = false;
 
                                     this.removePawn((whatWasClicked.boardX + pawn.pawnX) / 2, (whatWasClicked.boardY + pawn.pawnY) / 2);
 
@@ -331,8 +326,6 @@ export default class Game {
                                     else {
                                         pawnCanEat = this.checkIfBlackPawnCanEat(pawn);
                                     }
-
-                                    //console.log("pawnCanEat:", pawnCanEat);
 
                                     if (pawnCanEat) {
                                         this.clearPossibleMoves();
@@ -361,17 +354,18 @@ export default class Game {
             for (let j = 0; j < 8; j++) {
                 if (this.pawns[i][j] == 2) {
                     areWhitePawnsLeft = true;
-                    break;
                 } else if (this.pawns[i][j] == 1) {
                     areBlackPawnsLeft = true;
-                    break;
                 }
             }
         }
 
         if (areWhitePawnsLeft && this.player == "white" && !areBlackPawnsLeft) {
+            console.log("noPieces");
+
             net.lost("noPieces");
         } else if (areBlackPawnsLeft && this.player == "black" && !areWhitePawnsLeft) {
+            console.log("noPieces");
             net.lost("noPieces");
         }
     }
@@ -380,13 +374,13 @@ export default class Game {
         if (player == 1) {
             this.player = "white"
             new Tween.Tween(this.camera.position)
-                .to({ x: this.size * 4, y: 500, z: -100 }, 500)
+                .to({ x: this.size * 4, y: 700, z: -100 }, 500)
                 .easing(Tween.Easing.Circular.Out)
                 .start()
         } else {
             this.player = "black"
             new Tween.Tween(this.camera.position)
-                .to({ x: this.size * 4, y: 500, z: 500 }, 500)
+                .to({ x: this.size * 4, y: 700, z: 500 }, 500)
                 .easing(Tween.Easing.Circular.Out)
                 .start()
         }

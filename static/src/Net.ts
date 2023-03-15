@@ -51,6 +51,9 @@ export default class Net {
         this.client.on('lostGame', (data) => {
             console.log("got from server", data);
 
+            clearInterval(ui.timer)
+            ui.stopWaiting();
+
             if (data.loser == this.playerColor) {
                 ui.youWon(data.reason)
             } else {
@@ -182,6 +185,8 @@ export default class Net {
     lost = (reason: string) => {
         game.endGame = true
         game.clearPossibleMoves()
+
+        clearInterval(ui.timer)
 
         console.log(reason)
         this.client.emit("lost", {

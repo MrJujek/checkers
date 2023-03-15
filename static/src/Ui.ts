@@ -39,6 +39,7 @@ export default class Ui {
     }
 
     waitForSecondPlayer = () => {
+        this.stopWaiting()
         let waitingDiv = document.createElement("div")
         waitingDiv.id = "waitingDiv"
         waitingDiv.innerHTML = "Czekam na drugiego gracza"
@@ -46,6 +47,7 @@ export default class Ui {
     }
 
     waitForYourTurn = () => {
+        this.stopWaiting()
         let waitingDiv = document.createElement("div")
         waitingDiv.id = "waitingDiv"
 
