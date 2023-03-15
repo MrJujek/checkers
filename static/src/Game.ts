@@ -263,8 +263,6 @@ export default class Game {
 
                                             console.log("koniec ruchu - zwykly 2");
 
-                                            this.checkForPromotion(player, oldPawn);
-
                                             oldPawn = undefined;
 
                                             net.nextTurn();
@@ -310,8 +308,6 @@ export default class Game {
                                                 this.clearPossibleMoves();
                                                 console.log("koniec ruchu - zwykly 2");
 
-                                                this.checkForPromotion(player, oldPawn);
-
                                                 this.checkLoser();
 
                                                 this.capturingMode = false;
@@ -332,44 +328,51 @@ export default class Game {
         }
     }
 
-    checkForPromotion = (player: number, pawn: Pawn) => {
+    checkForPromotion = () => {
         console.log("checkForPromotion");
-        console.log(pawn);
 
-        if (pawn != undefined) {
-            if (player == 1) {
-                //bialy
-                if (pawn.pawnY == 7) {
-                    let x = pawn.pawnX;
-                    let y = pawn.pawnY;
+        for (let i = 0; i < this.scene.children.length; i++) {
+            if (this.scene.children[i] instanceof Pawn) {
+                let sceneChildren = <Pawn>this.scene.children[i];
 
-                    let cylinder
-                    cylinder = new Queen("white", this.size, y, x)
-                    this.scene.add(cylinder);
-                    cylinder.position.set(x * this.size + this.size / 2, 20, y * this.size + this.size / 2)
+                if (sceneChildren.player == "white") {
+                    if (sceneChildren.pawnY == 7) {
+                        let x = sceneChildren.pawnX;
+                        let y = sceneChildren.pawnY;
 
-                    console.log("promocja");
+                        this.removePawn(x, y)
 
-                    this.removePawn(x, y)
-                }
-            } else {
-                //czarny
-                if (pawn.pawnY == 0) {
-                    let x = pawn.pawnX;
-                    let y = pawn.pawnY;
+                        let cylinder = new Queen("white", this.size, y, x)
+                        this.scene.add(cylinder);
+                        cylinder.position.set(x * this.size + this.size / 2, 20, y * this.size + this.size / 2)
 
-                    let cylinder
-                    cylinder = new Queen("black", this.size, y, x)
-                    this.scene.add(cylinder);
-                    cylinder.position.set(x * this.size + this.size / 2, 20, y * this.size + this.size / 2)
+                        console.log("promocja");
 
-                    console.log("promocja");
+                        this.pawns[y][x] = 2;
 
-                    this.removePawn(x, y)
+                        break;
+                    }
+                } else if (sceneChildren.player == "black") {
+                    if (sceneChildren.pawnY == 0) {
+                        let x = sceneChildren.pawnX;
+                        let y = sceneChildren.pawnY;
+
+                        this.removePawn(x, y)
+
+                        let cylinder = new Queen("black", this.size, y, x)
+                        this.scene.add(cylinder);
+                        cylinder.position.set(x * this.size + this.size / 2, 20, y * this.size + this.size / 2)
+
+                        console.log("promocja");
+
+                        this.pawns[y][x] = 1;
+
+                        break;
+                    }
                 }
             }
         }
-        return
+        return 0;
     }
 
     nextCaptures = (pawn: Pawn) => {
@@ -1134,6 +1137,15 @@ export default class Game {
 
                     break;
                 }
+            } else if (this.scene.children[i] instanceof Queen) {
+                let sceneChildren = <Queen>this.scene.children[i];
+
+                if (sceneChildren.queenX == x && sceneChildren.queenY == y) {
+                    this.pawns[y][x] = 0;
+                    this.scene.remove(sceneChildren);
+
+                    break;
+                }
             }
         }
     }
@@ -1213,23 +1225,10 @@ export default class Game {
     }
 
     changeTurn = (bool: boolean) => {
-        console.log("changeTurn", this.player);
+        console.log(this.pawns);
+        console.log("changeTurn", this.yourTurn);
 
-        let toPromote: Pawn | undefined;
-
-        for (let i = 0; i < this.scene.children.length; i++) {
-            if (this.scene.children[i] instanceof Pawn) {
-                let sceneChildren = <Pawn>this.scene.children[i];
-                sceneChildren.material.color.setHex(0xffffff);
-
-                if (sceneChildren.pawnY == 7 || sceneChildren.pawnY == 0) {
-                    toPromote = sceneChildren;
-                }
-
-            }
-        }
-        this.checkForPromotion(this.player == "white" ? 1 : 2, toPromote!);
-
+        this.checkForPromotion();
         this.yourTurn = bool;
 
         return;

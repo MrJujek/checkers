@@ -175,6 +175,7 @@ export default class Net {
     }
 
     nextTurn = () => {
+        //game.checkForPromotion()
         console.log("next turn", this.playerColor);
 
         this.client.emit("nextTurn", {

@@ -88,7 +88,7 @@ export default class Ui {
 
         let lostDiv = document.createElement("div")
         lostDiv.id = "lostDiv"
-        lostDiv.innerHTML = "Przegrales!<br>" + reason
+        lostDiv.innerHTML = "Przegrałeś!<br>" + reason
 
         document.body.appendChild(lostDiv)
     }
@@ -101,7 +101,7 @@ export default class Ui {
 
         let wonDiv = document.createElement("div")
         wonDiv.id = "wonDiv"
-        wonDiv.innerHTML = "Wygrales!<br>" + reason
+        wonDiv.innerHTML = "Wygrałeś!<br>" + reason
 
         document.body.appendChild(wonDiv)
     }
