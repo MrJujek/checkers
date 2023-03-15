@@ -29,7 +29,7 @@ export default class Net {
         });
 
         this.client.on('capturePawnToClient', (data) => {
-            console.log("got from server", data);
+            console.log("capturePawnToClient:", data);
 
             game.captureEnemyPawn(data.fromX, data.fromY, data.toX, data.toY, data.pawns, data.removeX, data.removeY)
         });
