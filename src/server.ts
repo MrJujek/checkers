@@ -91,11 +91,16 @@ socketio.on('connection', (client) => {
     });
 
     client.on('nextTurn', (data) => {
+        console.log("turn1: ", turn);
+
         if (turn == "white") {
             turn = "black"
         } else {
             turn = "white"
         }
+
+        console.log("turn2: ", turn);
+
 
         console.log("nextTurn: ", data);
         socketio.emit("turn", {
