@@ -15,7 +15,7 @@ app.use(express.static('static/dist'))
 app.use(express.urlencoded({
     extended: true
 }));
-
+let turn = "white"
 let users: string[]
 
 app.get("/", function (req, res) {
@@ -55,11 +55,12 @@ app.post("/GET_USERS", (req, res) => {
     res.end(JSON.stringify(users.length));
 })
 
-let turn = "white"
+
 socketio.on('connection', (client) => {
     console.log("klient się podłączył z id = ", client.id)
 
     client.on("startGame", (data) => {
+        turn = "white"
         console.log("startgame: ", data);
 
         socketio.emit("turn", {
@@ -90,7 +91,21 @@ socketio.on('connection', (client) => {
         })
     });
 
+    client.on("capturebyqueen", (data) => {
+        client.broadcast.emit("captureByQueenToClient", {
+            fromX: data.fromX,
+            fromY: data.fromY,
+            toX: data.toX,
+            toY: data.toY,
+            pawns: data.pawns,
+            xList: data.xList,
+            yList: data.yList
+        })
+    });
+
     client.on('nextTurn', (data) => {
+        console.log("nextTurn: ", data);
+
         console.log("turn1: ", turn);
 
         if (turn == "white") {
@@ -101,8 +116,6 @@ socketio.on('connection', (client) => {
 
         console.log("turn2: ", turn);
 
-
-        console.log("nextTurn: ", data);
         socketio.emit("turn", {
             turn: turn
         })

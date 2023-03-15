@@ -59,16 +59,6 @@ export default class Game {
             [0, 1, 0, 1, 0, 1, 0, 1], //y 6
             [1, 0, 1, 0, 1, 0, 1, 0]  //y 7
         ];
-        // this.pawns = [
-        //     [0, 1, 0, 2, 0, 0, 0, 0],
-        //     [2, 0, 0, 0, 0, 0, 0, 0],
-        //     [0, 0, 0, 2, 0, 0, 0, 0],
-        //     [0, 0, 0, 0, 0, 0, 2, 0],
-        //     [0, 1, 0, 1, 0, 0, 0, 0],
-        //     [0, 0, 1, 0, 1, 0, 1, 0],
-        //     [0, 0, 0, 0, 0, 0, 0, 0],
-        //     [0, 0, 0, 0, 2, 0, 0, 0]
-        // ];
 
         //this.scene.add(new THREE.AxesHelper(100))
 
@@ -353,16 +343,6 @@ export default class Game {
                                                 net.nextTurn();
                                             } else if (whatWasClicked.material.color.getHex() == 0x0000ff) {
                                                 //capture pawn do naprawienia
-                                                /*
-                                                ####################################################################################
-                                                ####################################################################################
-                                                ####################################################################################
-                                                ####################################################################################
-                                                ####################################################################################
-                                                ####################################################################################
-                                                ####################################################################################
-                                                ####################################################################################
-                                                                                                */
 
                                                 new Tween.Tween(oldPawn.position)
                                                     .to({ x: whatWasClicked.position.x, z: whatWasClicked.position.z }, 500)
@@ -413,10 +393,13 @@ export default class Game {
                                                 //console.log("yList:", yList);
 
                                                 for (let i = 0; i < xList.length; i++) {
+                                                    console.log("usuwanie");
+
                                                     this.removePawn(xList[i], yList[i]);
                                                     this.pawns[yList[i]][xList[i]] = 0;
-                                                    net.capturePawn(oldPawn.queenX, oldPawn.queenY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns, xList[i], yList[i])
                                                 }
+
+                                                net.captureByQueen(oldPawn.queenX, oldPawn.queenY, whatWasClicked.boardX, whatWasClicked.boardY, this.pawns, xList, yList);
 
                                                 oldPawn.queenX = whatWasClicked.boardX;
                                                 oldPawn.queenY = whatWasClicked.boardY;
@@ -444,8 +427,64 @@ export default class Game {
         }
     }
 
+    captureEnemyPawnByQueen = (pawnX: number, pawnY: number, boardX: number, boardY: number, pawns: number[][], xList: number[], yList: number[]) => {
+        this.pawns = pawns;
+        let pawnToMove: Pawn | Queen;
+        let whereToMove: BoardSquare;
+
+        for (let i = 0; i < this.scene.children.length; i++) {
+            if (this.scene.children[i] instanceof Pawn) {
+                let sceneChildren = <Pawn>this.scene.children[i];
+                if (sceneChildren.pawnX == pawnX && sceneChildren.pawnY == pawnY) {
+                    pawnToMove = sceneChildren;
+
+                    break;
+                }
+            } else if (this.scene.children[i] instanceof Queen) {
+                let sceneChildren = <Queen>this.scene.children[i];
+                if (sceneChildren.queenX == pawnX && sceneChildren.queenY == pawnY) {
+                    pawnToMove = sceneChildren;
+
+                    break;
+                }
+            }
+        }
+        for (let i = 0; i < this.scene.children.length; i++) {
+            if (this.scene.children[i] instanceof BoardSquare) {
+                let sceneChildren = <BoardSquare>this.scene.children[i];
+                if (sceneChildren.boardX == boardX && sceneChildren.boardY == boardY) {
+                    whereToMove = sceneChildren;
+
+                    break;
+                }
+            }
+        }
+        //console.log("moveEnemyPawn");
+
+        new Tween.Tween(pawnToMove!.position)
+            .to({ x: whereToMove!.position.x, z: whereToMove!.position.z }, 500)
+            .easing(Tween.Easing.Circular.Out)
+            .start()
+
+        if (pawnToMove! instanceof Pawn) {
+
+            pawnToMove!.pawnX = whereToMove!.boardX;
+            pawnToMove!.pawnY = whereToMove!.boardY;
+        } else if (pawnToMove! instanceof Queen) {
+            pawnToMove!.queenX = whereToMove!.boardX;
+            pawnToMove!.queenY = whereToMove!.boardY;
+        }
+
+        for (let i = 0; i < xList.length; i++) {
+            console.log("usuwanie");
+
+            this.removePawn(xList[i], yList[i]);
+            this.pawns[yList[i]][xList[i]] = 0;
+        }
+    }
+
     checkForPromotion = () => {
-        console.log("checkForPromotion");
+        //console.log("checkForPromotion");
 
         for (let i = 0; i < this.scene.children.length; i++) {
             if (this.scene.children[i] instanceof Pawn) {
@@ -602,13 +641,13 @@ export default class Game {
         if (player == 1) {
             this.player = "white"
             new Tween.Tween(this.camera.position)
-                .to({ x: this.size * 4, y: 700, z: -100 }, 500)
+                .to({ x: this.size * 4, y: 900, z: 100 }, 500)
                 .easing(Tween.Easing.Circular.Out)
                 .start()
         } else {
             this.player = "black"
             new Tween.Tween(this.camera.position)
-                .to({ x: this.size * 4, y: 700, z: 500 }, 500)
+                .to({ x: this.size * 4, y: 900, z: 300 }, 500)
                 .easing(Tween.Easing.Circular.Out)
                 .start()
         }
@@ -1431,8 +1470,8 @@ export default class Game {
     }
 
     changeTurn = (bool: boolean) => {
-        console.log(this.pawns);
-        console.log("changeTurn", this.yourTurn);
+        //console.log(this.pawns);
+        //console.log("changeTurn", this.yourTurn);
 
         this.checkForPromotion();
         this.yourTurn = bool;

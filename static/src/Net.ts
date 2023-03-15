@@ -8,11 +8,14 @@ export default class Net {
     url: string = "https://dev.juliandworzycki.pl/api"
     client: Socket
     playerColor: string
+    youplay: boolean
 
     constructor() {
         this.playerColor = ""
         this.playerInfo = document.getElementById("playerInfo") as HTMLElement
         this.mainDiv = document.getElementById("mainDiv") as HTMLElement
+        this.youplay = false
+
 
         this.client = io("/", {
             path: "/socket.io"
@@ -23,19 +26,37 @@ export default class Net {
         });
 
         this.client.on('movePawnToClient', (data) => {
+            if (this.youplay == false) {
+                return
+            }
             console.log("got from server", data);
 
             game.moveEnemyPawn(data.fromX, data.fromY, data.toX, data.toY, data.pawns)
         });
 
         this.client.on('capturePawnToClient', (data) => {
+            if (this.youplay == false) {
+                return
+            }
             console.log("capturePawnToClient:", data);
 
             game.captureEnemyPawn(data.fromX, data.fromY, data.toX, data.toY, data.pawns, data.removeX, data.removeY)
         });
 
+        this.client.on('captureByQueenToClient', (data) => {
+            if (this.youplay == false) {
+                return
+            }
+            console.log("captureByQueenToClient:", data);
+
+            game.captureEnemyPawnByQueen(data.fromX, data.fromY, data.toX, data.toY, data.pawns, data.xList, data.yList)
+        });
+
         this.client.on('turn', (data) => {
-            console.log("got from server1111", data);
+            if (this.youplay == false) {
+                return
+            }
+            console.log("turn:", data);
 
             if (data.turn == this.playerColor) {
                 game.changeTurn(true)
@@ -49,6 +70,11 @@ export default class Net {
         });
 
         this.client.on('lostGame', (data) => {
+            if (this.youplay == false) {
+                return
+            }
+            this.youplay = false
+
             console.log("got from server", data);
 
             clearInterval(ui.timer)
@@ -81,10 +107,12 @@ export default class Net {
                             }
 
                             if (data == "1") {
+                                this.youplay = true
                                 this.mainDiv.remove()
                                 this.playerInfo.innerHTML = nick + " grasz bialymi"
                                 this.playerColor = "white"
                             } else if (data == "2") {
+                                this.youplay = true
                                 this.mainDiv.remove()
                                 if (this.playerInfo.innerHTML != nick + " grasz bialymi") {
                                     this.playerInfo.innerHTML = nick + " grasz czarnymi"
@@ -99,7 +127,7 @@ export default class Net {
                             }
                         })
             })();
-        }, 500);
+        }, 1000);
     }
 
     loguj = () => {
@@ -174,8 +202,19 @@ export default class Net {
         })
     }
 
+    captureByQueen = (fromX: number, fromY: number, toX: number, toY: number, pawns: number[][], xList: number[], yList: number[]) => {
+        this.client.emit("capturebyqueen", {
+            fromX: fromX,
+            fromY: fromY,
+            toX: toX,
+            toY: toY,
+            pawns: pawns,
+            xList: xList,
+            yList: yList
+        })
+    }
+
     nextTurn = () => {
-        //game.checkForPromotion()
         console.log("next turn", this.playerColor);
 
         this.client.emit("nextTurn", {
